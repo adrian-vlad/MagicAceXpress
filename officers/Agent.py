@@ -47,6 +47,7 @@ class Agent(object):
         def signal_handler(sig, frame):
             if sig == signal.SIGINT or sig == signal.SIGTERM:
                 self._shutdown = True
+
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
 

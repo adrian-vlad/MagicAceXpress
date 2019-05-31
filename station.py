@@ -40,7 +40,10 @@ def main():
         officers.shift_start()
 
         Captain(config.station_name_get()).perform()
+    except Exception as e:
+        l.error(e, exc_info=True)
 
+    try:
         officers.shift_end()
     except Exception as e:
         l.error(e, exc_info=True)
