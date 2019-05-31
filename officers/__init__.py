@@ -51,7 +51,6 @@ def _org_chart_remove(name):
 
 
 def perform(name, duty, warrant):
-    agent_class = None
     try:
         import_obj = importlib.import_module("officers.{0}".format(duty))
         agent_class = getattr(import_obj, "Agent", None)
@@ -59,12 +58,17 @@ def perform(name, duty, warrant):
         l.error("Agent duty {0} not found: {1}".format(duty, e))
         return
 
-    agent = agent_class(name, warrant)
+    try:
+        agent = agent_class(name, warrant)
+    except Exception as e:
+        l.error("Agent duty {0} failed to initialize: {1}".format(duty, e), exc_info=True)
+        return
+
     while not agent._shutdown:
         try:
             agent.perform()
         except Exception as e:
-            l.error("Agent could not perform: {0}".format(e))
+            l.error("Agent could not perform: {0}".format(e), exc_info=True)
 
 
 def _officer_dispatch(name, duty, warrant):
