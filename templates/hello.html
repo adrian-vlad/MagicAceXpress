@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+function generationCreateSettings() {
+	var station = document.getElementById("station").value;
+	var name = document.getElementById("name").value;
+	var title = document.getElementById("title").value;
+	var pin = document.getElementById("pin").value;
+
+    var settings = '{"name": "' + name + '", "assignment": { "title": "' + title + '", "settings": {"pin": ' + pin + '}}}';
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", "/officer/?station=" + station);
+    xmlhttp.send(settings);
+}
+
+// Objects for each officer
+
+function officer_gpio_in(name, settings) {
+    var div = document.createElement("div");
+
+    var p1 = document.createElement("p");
+    p1.innerHTML = JSON.stringify(name);
+
+    var p2 = document.createElement("p");
+    p2.innerHTML = JSON.stringify(settings);
+
+    div.appendChild(p1);
+    div.appendChild(p2);
+
+    return div;
+}
+
+function officer_gpio_out(name, settings) {
+    var div = document.createElement("div");
+
+    var p1 = document.createElement("p");
+    p1.innerHTML = JSON.stringify(name);
+
+    var p2 = document.createElement("p");
+    p2.innerHTML = JSON.stringify(settings);
+
+    div.appendChild(p1);
+    div.appendChild(p2);
+
+    return div;
+}
+
+function createOfficer(data) {
+
+    var name = data["name"]
+    var assignment = data["assignment"]
+    var title = assignment["title"]
+    var settings = assignment["settings"]
+
+    var obj = null;
+    switch(title) {
+        case "gpio_in":
+            obj = officer_gpio_in(name, settings);
+            break;
+        case "gpio_out":
+            obj = officer_gpio_out(name, settings);
+            break;
+        default:
+            // TODO: error
+            text = "I have never heard of that fruit...";
+    }
+
+    return obj;
+}
+
+function update_officers() {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "/officer");
+    xmlhttp.send();
+
+    // TODO: de vazut ce face asta exact
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState != 4)
+            return;
+        if (this.status != 200)
+        {
+            alert("Failed to get list of files");
+            return
+        }
+
+        var data = JSON.parse(this.responseText);
+
+        console.log(data);
+
+        var officers = document.getElementById("officers");
+        while(officers.firstChild) {
+            officers.removeChild(officers.firstChild);
+        }
+
+        for (officer_data in data) {
+            var obj = createOfficer(data[officer_data]);
+            console.log(obj);
+            officers.appendChild(obj)
+        }
+    };
+}
+
+</script>
+
+<button onclick="generationCreateSettings();">Create new officer</button>
+<button onclick="update_officers();">Update officers</button>
+
+<select id="station">
+<option value="home/station/first_client">home/station/first_client</option>
+</select>
+<textarea id="name">name</textarea>
+<select id="title">
+<option value="gpio_out">gpio_out</option>
+<option value="gpio_in">gpio_in</option>
+</select>
+<textarea id="pin">pin</textarea>
+
+<textarea id="output">output</textarea>
+
+
+<div id="officers">
+
+</div>
+
+</body>
+</html>

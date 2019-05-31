@@ -1,0 +1,48 @@
+function drag_div(div_id){
+var div;
+
+div = document.getElementById(div_id);
+
+if(div == null){
+   div = document.createElement("div");
+   div.id = div_id;
+   div.style.position = "absolute";
+   div.style.left = "0px";
+   div.style.top = "0px";
+   div.style.width = "100px";
+   div.style.height = "100px";
+   div.style.background = "red";
+   div.style.color = "blue";
+   document.body.appendChild(div);
+}
+
+div.addEventListener('mousedown', function(e) {
+    div.isDown = true;
+    div.offset = [
+        div.offsetLeft - e.clientX,
+        div.offsetTop - e.clientY
+    ];
+}, true);
+
+div.addEventListener('mouseup', function() {
+    div.isDown = false;
+}, true);
+
+div.addEventListener('mousemove', function(event) {
+		if (!should_drag)
+    		return;
+    event.preventDefault();
+    if (div.isDown) {
+        div.mousePosition = {
+
+            x : event.clientX,
+            y : event.clientY
+
+        };
+        div.style.left = (div.mousePosition.x + div.offset[0]) + 'px';
+        div.style.top  = (div.mousePosition.y + div.offset[1]) + 'px';
+    }
+}, true);
+}
+should_drag = false;
+drag_div("haha")

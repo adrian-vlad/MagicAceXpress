@@ -1,0 +1,52 @@
+import logging.config
+from logging import getLogger
+
+import config
+import officers
+from officers.Chief import Agent as Chief
+
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'default': {
+            'level':'DEBUG',
+            "formatter": "standard",
+            'class': 'logging.FileHandler',
+            'filename': config.LOG_FILE_PATH,
+            'mode': 'a',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True
+        }
+    }
+})
+
+l = getLogger(__name__)
+
+
+def main():
+    try:
+        officers.shift_start()
+
+        Chief(config.station_name_get()).perform()
+
+        officers.shift_end()
+    except Exception as e:
+        l.error(e, exc_info=True)
+
+    l.info("Stopped")
+
+
+if __name__ == "__main__":
+    main()
